@@ -1,0 +1,92 @@
+﻿@model PagedList.IPagedList<gmbdb.Review>
+@using PagedList.Mvc;
+@using gmbdb.Controllers;
+
+<link href="~/Content/PagedList.css" rel="stylesheet" type="text/css" />
+
+@{
+    ViewBag.Title = "Review Feed";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    
+    if (Session["currentUser"] == null)
+    {
+        Response.Redirect("~/Users/Login");
+    }
+}
+<br />
+<div class="row">
+    @using (Html.BeginForm("Index", "Reviews", FormMethod.Get))
+    {
+        <div class="col-md-3">
+            <p>Search: </p>@Html.TextBox("Search", ViewBag.CurrentFilter as string)
+                <input type="submit" value="Filter" class="btn-primary" />
+            </div>
+    }
+</div>
+<br />
+
+
+<table class="table">
+    <tr>
+        <th>
+            @Html.ActionLink("Title", "Index", new { sortType = ViewBag.NameSort, currentFilter = ViewBag.CurrentFilter })
+        </th>
+        <th>
+            @Html.ActionLink("Date Added", "Index", new { sortType = ViewBag.DateSort, currentFilter = ViewBag.CurrentFilter })
+        </th>
+        <th>
+            @Html.ActionLink("User Rating", "Index", new { sortType = ViewBag.UserRatingSort, currentFilter = ViewBag.CurrentFilter })
+        </th>
+        <th>
+            @Html.ActionLink("Likes", "Index", new { sortType = ViewBag.LikesSort, currentFilter = ViewBag.CurrentFilter })
+        </th>
+        <th>
+            @Html.ActionLink("Dislikes", "Index", new { sortType = ViewBag.DislikesSort, currentFilter = ViewBag.CurrentFilter })
+        </th>
+        <th>
+            @Html.ActionLink("Type", "Index", new { sortType = ViewBag.TypeSort, currentFilter = ViewBag.CurrentFilter })
+        </th>
+        <th>
+            Author
+        </th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model) {
+
+        //fetch creation date and convert to xxxx-xx-xx format instead of xxxx-xx-xx 00:00:00
+        var shortDate = item.CreatedDate.ToShortDateString();
+
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Title)
+            </td>
+            <td>
+                @Html.Raw(shortDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.UserRating)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.LikeCount)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DislikeCount)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Type)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.User.Username)
+            </td>
+            <td>
+                @Html.ActionLink("Read more", "Details", new { id=item.Id })
+            </td>
+        </tr>
+    }
+</table>
+
+Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
+
+@Html.PagedListPager(Model, page => Url.Action("Index",
+    new { page, sortType = ViewBag.CurrentSort, currentFilter = ViewBag.CurrentFilter }))

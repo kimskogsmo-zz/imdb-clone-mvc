@@ -1,0 +1,154 @@
+﻿@using System.Web.UI.WebControls
+@model User
+
+@{
+    ViewBag.Title = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    if (Session["currentUser"] == null)
+    {
+        Response.Redirect("~/Users/Login");
+    }
+}
+
+<h2>
+    @{
+        if (((User) Session["currentUser"]).Id == Model.Id)
+        {
+            @Html.Raw("Your profile")
+        }
+        else
+        {
+            @Html.Raw(Model.Username + "'s Profile")
+        }
+    }
+</h2>
+<p>
+    @if ( ((User)Session["currentUser"]).Id == Model.Id )
+    {
+        @Html.ActionLink("Edit Settings", "Edit", new { id = Model.Id })
+        @Html.Raw(" | ")
+        @Html.ActionLink("Delete your profile?", "Delete", new { id = Model.Id })
+    }
+</p>
+
+<div>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Username)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Username)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Email)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Email)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.FirstName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.FirstName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.LastName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.LastName)
+        </dd>
+    </dl>
+    <hr />
+</div>
+
+<h3>
+    @{
+        if (((User)Session["currentUser"]).Id == Model.Id)
+        {
+            @Html.Raw("Your Reviews")
+        }
+        else
+        {
+            @Html.Raw(Model.Username + "'s Reviews")
+        }
+    }
+</h3>
+
+@if (Model.Reviews.Count < 1)
+{
+    <p>Seems like you don't have any reviews yet. :( @Html.ActionLink("Create one?", "Create", "Reviews")</p>
+}
+else
+{
+    <table class="table">
+        <tr>
+            <td>Title</td>
+            <td>Creation Date</td>
+            <td>
+                @{
+                    if (((User) Session["currentUser"]).Id == Model.Id)
+                    {
+                        @Html.Raw("Your Rating")
+                    }
+                    else
+                    {
+                        @Html.Raw("User Rating")
+                    }
+                }
+            </td>
+            <td>Likes</td>
+            <td>Dislikes</td>
+            <td>Type</td>
+        </tr>
+
+        @foreach (var review in Model.Reviews)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => review.Title)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => review.CreatedDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => review.UserRating)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => review.LikeCount)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => review.DislikeCount)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => review.Type)
+                </td>
+
+                @if (((User) Session["currentUser"]).Id == Model.Id)
+                {
+                    <td>
+                        @Html.ActionLink("Edit Review", "Edit", "Reviews", new {id = review.Id}, null)
+                        @Html.Raw(" |")
+                        <a href="~/Reviews/Details/@Html.Raw(review.Id)">Open Review</a>
+                    </td>
+                }
+                else
+                {
+                    <td>
+                        <a href="~/Reviews/Details/@Html.Raw(review.Id)">Open Review</a>
+                    </td>
+                }
+            </tr>
+        }
+    </table>
+
+    @Html.ActionLink("If you want to delete reviews, click here", "DeleteReviews", "Reviews", new { id = Model.Id }, null);
+                    }

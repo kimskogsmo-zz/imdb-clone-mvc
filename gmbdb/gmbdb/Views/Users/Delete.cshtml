@@ -1,0 +1,24 @@
+﻿@model gmbdb.User
+
+@{
+    ViewBag.Title = "Delete";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    if (Session["currentUser"] == null)
+    {
+        Response.Redirect("~/Users/Login");
+    }
+}
+
+<h2>Account Deletion</h2>
+
+<p>Are you sure you want to delete your account? If you do, all your reviews will also be deleted!</p>
+
+    @using (Html.BeginForm("Delete", "Users")) {
+        @Html.AntiForgeryToken()
+
+        <div class="form-actions no-color">
+            <p>Yep, I'm sure... </p>
+
+            <input type="submit" value="Delete" class="btn btn-default" />
+        </div>
+    }

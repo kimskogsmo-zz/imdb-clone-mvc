@@ -1,0 +1,70 @@
+﻿@model User
+
+@{
+    ViewBag.Title = "Delete Reviews";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Delete Reviews</h2>
+
+<h3>Select the reviews you want to delete</h3>
+
+<div>
+   @{ Html.BeginForm("BatchDeleteReviews", "Reviews", FormMethod.Post, new { name = "reviewTable" }); }
+    
+    <table class="table table-striped table-condensed table-bordered">
+        <tr>
+            <th>
+               Select
+            </th>
+            <th>
+               Title
+            </th>
+            <th>
+               Type
+            </th>
+            <th>
+               Likes
+            </th>
+            <th>
+               Your Rating
+            </th>
+            <th>
+               Date Added
+            </th>
+        </tr>
+
+        @foreach (var item in Model.Reviews)
+        {
+            var shortString = item.CreatedDate.ToShortDateString();
+            <tr>
+                <td>
+                    <input type="checkbox" name="reviewIds" value="@item.Id" />
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Title)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Type)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.LikeCount)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.UserRating)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => shortString)
+                </td>
+            </tr>
+        }
+    </table>
+
+    <!-- Section for buttons -->
+    <div class="actions">
+        <a href="javascript:(function(){document.reviewTable.submit();return void(0);})()">
+            Delete selected reviews
+        </a>
+    </div>
+    @{ Html.EndForm(); }
+</div>

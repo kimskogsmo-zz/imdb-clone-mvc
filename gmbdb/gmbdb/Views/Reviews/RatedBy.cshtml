@@ -1,0 +1,40 @@
+﻿@using System.Linq
+@model Review
+@{
+    ViewBag.Title = "RatedBy";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    if (Session["currentUser"] == null)
+    {
+        Response.Redirect("~/Users/Login");
+    }
+}
+
+<h2>Who rated that?!</h2>
+<h3>@Model.Title</h3>
+<hr />
+@if (Model.UserToReviews.Sum(x => Convert.ToDecimal(x.Rating)) == 0)
+{
+    <p>Noone has rated this review yet.</p>
+}
+else
+{
+    foreach (var usertorev in Model.UserToReviews)
+    {
+        if (usertorev.Rating > 0)
+        {
+            <div class="row">
+                <div class="col-md-12">
+                    <a href="~/Users/Profile/?username=@usertorev.User.Username">
+                        @usertorev.User.Username
+                    </a> rated this review: @usertorev.Rating
+                </div>
+            </div>
+        }
+    }
+}
+
+<hr />
+
+@Html.ActionLink("Back to review :)", "Details", "Reviews", new { id = Model.Id }, null)
+

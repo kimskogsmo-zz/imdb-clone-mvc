@@ -1,0 +1,130 @@
+﻿@using gmbdb.Controllers
+@model gmbdb.Review
+
+@{
+    ViewBag.Title = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var shortDate = Model.CreatedDate.ToShortDateString();
+    var currentReviewId = Model.Id;
+
+    IEnumerable<SelectListItem> ratingValues = new[]
+    {
+        new SelectListItem {Value = "1", Text = "1"},
+        new SelectListItem {Value = "2", Text = "2"},
+        new SelectListItem {Value = "3", Text = "3"},
+        new SelectListItem {Value = "4", Text = "4"},
+        new SelectListItem {Value = "5", Text = "5"}
+    };
+
+    IEnumerable<int> likeOrDislike = new[] {1, 2};
+
+
+    if (Session["currentUser"] == null)
+    {
+        Response.Redirect("~/Users/Login");
+    }
+}
+
+<h2>@Html.DisplayFor(model => model.Title)</h2>
+
+<div>
+    <h4>@Html.DisplayFor(model => model.Type) Review </h4> 
+    
+    <hr />
+    <ul class="list-inline">
+        <li style="padding-left: 0;">Date Added: @Html.Raw(shortDate)</li>
+        <li>Creator: @Html.ActionLink(Model.User.FullName, "Profile", "Users", new { username = Model.User.Username }, null) </li>
+        <li>User Rating: @Html.DisplayFor(model => model.UserRating)</li>
+        <li>Review Score: 
+            <span id="ratingText"></span> 
+            / 5 
+            <a href="~/Reviews/RatedBy?id=@currentReviewId" style="font-size: 10px">who?</a>
+        </li>
+        <li>Likes: @Html.DisplayFor(model => model.LikeCount)</li>
+        <li>Dislikes: @Html.DisplayFor(model => model.DislikeCount)</li>
+    </ul>
+    <hr />
+    <div class="row">
+        <div class="col-md-2">
+            <img src="~/Content/pic.png" style="max-width: 150px; height: auto;" /> <!-- just a placeholder for now -->
+            
+            <br /><br />
+            
+            <div class="btn-group-xs" role="toolbar" aria-label="...">
+                @{
+                    if (((User)Session["currentUser"]).Id != Model.CreatorUserId)
+                    {
+                        <p class="bottom" style="font-size: 1.2rem">Rate this Review</p>
+                        <!-- rate review -->
+                        
+                        foreach (var rating in ratingValues)
+                        {
+                            @Html.Label(rating.Text)
+                            @Html.RadioButtonFor(x => x.UserRating, rating.Value, new { id = "ratingRadio", @class = "radio" })
+                        }
+
+                        <button id="rateButton" value="@currentReviewId">Rate</button>
+
+                        <br />
+                        <br />
+                        <!-- like buttons -->
+                        <p class="bottom" style="font-size: 1.2rem">Did you like this review?</p>
+                        <div class="btn-group-xs" role="group" aria-label="...">
+                            <button id="likeButton" type="button" value="@currentReviewId" class="btn btn-default"><span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span></button>
+                            <button id="dislikeButton" type="button" value="@currentReviewId" class="btn btn-default"><span class="glyphicon glyphicon-thumbs-down" aria-hidden="true"></span></button>
+                        </div>
+                    }
+                }
+            </div>
+            
+            <br /> 
+        </div>
+
+        <div class="col-md-10">
+            <h4>Description</h4>
+            <p>@Html.DisplayFor(model => model.Description)</p>
+
+            <br /><br /><br />
+
+            <h4>Comments</h4>
+            <div id="comments">
+                <hr />
+                @{
+                    var comments = Model.CommentToReviews.OrderByDescending(x => x.CreatedDate).ToList();
+
+                    if (comments.Count < 1)
+                    {
+                        <p>No comments for this review, yet!</p>
+                    }
+
+
+                    foreach (var comment in comments)
+                    {
+                        <div class="row">
+                            <div class="col-xs-3">
+                                Posted by <a href="~/Users/Profile/?username=@Html.Raw(comment.User.Username)">
+                                    @Html.Raw(comment.User.Username) <br />
+                                </a>Posted: @Html.Raw(comment.CreatedDate.ToShortDateString())
+                            </div>
+                            <div class="col-xs-7">
+                                @Html.Raw(comment.Comment)
+                            </div>
+                        </div>
+                        <hr />
+                    }
+                }
+            </div>
+
+            <strong>Weigh in</strong>
+            
+            @Html.ValidationMessage("CommentError", new { @class = "ui-state-error-text" })
+            <input class="form-control" placeholder="Your comment here!" id="commentText">
+            <button id="postComment" class="btn" value="@currentReviewId">Post Comment</button>
+            
+            <hr />
+        </div>
+    </div>
+</div>
+<p>
+    @Html.ActionLink("Back to Feed", "Index")
+</p>

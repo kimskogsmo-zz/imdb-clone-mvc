@@ -1,0 +1,22 @@
+﻿@using gmbdb;
+
+@if (Session["currentUser"] != null)
+{
+    var userName = ((User)Session["currentUser"]).Username;
+
+    <ul class="nav navbar-nav" style="float: right">
+        <li>
+            @Html.ActionLink($"Hello, {userName}", "Profile", "Users", new { username = userName }, null)
+        </li>
+        <li>
+            @Html.ActionLink("Sign out", "Logout", "Users")
+        </li>
+    </ul>
+}
+else
+{
+    <ul class="nav navbar-nav" style="float: right">
+        <li>@Html.ActionLink("Register", "Create", "Users")</li>
+        <li>@Html.ActionLink("Log in", "Login", "Users")</li>
+    </ul>
+}

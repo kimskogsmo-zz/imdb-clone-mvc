@@ -1,0 +1,14 @@
+﻿@model gmbdb.User
+@using gmbdb;
+
+@{
+    ViewBag.Title = "You are being signed out";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Sign out</h2>
+<p>You will be signed out in a few seconds...</p>
+
+@{ 
+    Session["currentUser"] = null;
+}
